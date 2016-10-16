@@ -1,8 +1,8 @@
-package uk.me.gman.getmedia;
+package com.tlvince.streammedia;
 
 import android.app.Activity;
-import android.app.DownloadManager;
 import android.content.Context;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Environment;
@@ -23,18 +23,17 @@ public class AsyncGetJSON extends AsyncTask<String, Integer, Long> {
 
     public AsyncResponse delegate = null;
     private Context context;
+    private Activity activity;
     private TextView textView;
     private CharSequence defaultText;
 
     public AsyncGetJSON( Activity mAct, TextView text ) {
-        //this.delegate = mAct;
+        activity = mAct;
         context = mAct.getApplicationContext();
 
         textView = text;
         defaultText = textView.getText();
     }
-
-
 
     @Override
     protected Long doInBackground(String... params) {
@@ -43,7 +42,6 @@ public class AsyncGetJSON extends AsyncTask<String, Integer, Long> {
 
         try {
             url = new URL(params[0]);
-            //url = new URL("http://youtube-dl55.herokuapp.com/api/info?url=https://youtu.be/R_dd7eVGAh0");
 
             Log.i(TAG, "url: " + url.toString());
 
@@ -63,41 +61,19 @@ public class AsyncGetJSON extends AsyncTask<String, Integer, Long> {
             Log.i(TAG, "out: " + json.toString());
 
             String downloadURL = json.getJSONObject("info").get("url").toString();
-            String fileName = json.getJSONObject("info").get("title").toString() + "." + json.getJSONObject("info").get("ext").toString();
-
-            // remove all special characters from the filename
-            fileName = fileName.replaceAll("[^\\w\\s.-]", "");
-
-                /*
-                //DO we care? Just download the default file
-                JSONArray jsonT = json.getJSONObject("info").getJSONArray("formats");
-                int id = findIdToDownload(jsonT, "mp4", 720);
-                if(id != -1) {
-                    downloadURL = json.getJSONObject("info").getJSONArray("formats").getJSONObject(id).get("url").toString();
-                }
-                */
+            String title = json.getJSONObject("info").get("title").toString();
 
             Log.i(TAG, "downloadUrl: " + downloadURL);
-            Log.i(TAG, "fileName: " + fileName);
 
             publishProgress(2);
 
-            DownloadManager.Request r = new DownloadManager.Request(Uri.parse(downloadURL));
-
-            // This put the download in the same Download dir the browser uses
-            r.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS,fileName );
-
-            // When downloading music and videos they will be listed in the player
-            // (Seems to be available since Honeycomb only)
-            r.allowScanningByMediaScanner();
-
-            // Notify user when download is completed
-            // (Seems to be available since Honeycomb only)
-            r.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
-
-            // Start download
-            DownloadManager dm = (DownloadManager)context.getSystemService(Context.DOWNLOAD_SERVICE);
-            dm.enqueue(r);
+            int vlcRequestCode = 42;
+            Uri uri = Uri.parse(downloadURL);
+            Intent vlcIntent = new Intent(Intent.ACTION_VIEW);
+            vlcIntent.setPackage("org.videolan.vlc");
+            vlcIntent.setDataAndTypeAndNormalize(uri, "video/*");
+            vlcIntent.putExtra("title", title);
+            activity.startActivityForResult(vlcIntent, vlcRequestCode);
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -136,8 +112,8 @@ public class AsyncGetJSON extends AsyncTask<String, Integer, Long> {
             Toast.makeText(context, "Getting Video URL", Toast.LENGTH_SHORT).show();
             textView.setText(defaultText + "Getting Video URL...\n");
         } else if (progress[0] == 2) {
-            Toast.makeText(context, "Starting Download", Toast.LENGTH_LONG).show();
-            textView.setText(defaultText + "Starting Download...\n");
+            Toast.makeText(context, "Starting VLC", Toast.LENGTH_LONG).show();
+            textView.setText(defaultText + "Starting VLC...\n");
         } else if (progress[0] == 0xFF) {
             Toast.makeText(context, "Unsupported site?" , Toast.LENGTH_LONG).show();
             textView.setText(defaultText + "Unsupported site?\n");

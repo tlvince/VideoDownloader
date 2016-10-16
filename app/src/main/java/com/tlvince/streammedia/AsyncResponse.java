@@ -1,4 +1,4 @@
-package uk.me.gman.getmedia;
+package com.tlvince.streammedia;
 
 public interface AsyncResponse {
 

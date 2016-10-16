@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Get Media!</string>
+    <string name="app_name">Stream Media!</string>
     <string name="hide_app">Hide From Launcher</string>
     <string name="about_settings">About</string>
 </resources>

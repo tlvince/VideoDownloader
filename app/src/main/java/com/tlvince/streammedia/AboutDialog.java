@@ -1,4 +1,4 @@
-package uk.me.gman.getmedia;
+package com.tlvince.streammedia;
 
 import android.app.Dialog;
 import android.content.Context;

@@ -1,11 +1,9 @@
-package uk.me.gman.getmedia;
+package com.tlvince.streammedia;
 
 import android.Manifest;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -26,19 +24,6 @@ public class HandleDownload extends AppCompatActivity implements AsyncResponse {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_handle_download);
-
-        final int REQUEST_CODE_ASK_PERMISSIONS = 123;
-        if( ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED ) {
-            ActivityCompat.requestPermissions(this,
-                    new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-                    REQUEST_CODE_ASK_PERMISSIONS);
-
-        }
-        if( ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED ) {
-            Toast.makeText(this, "We *need* Permissions to write to storage!", Toast.LENGTH_LONG).show();
-            return;
-        }
-
 
         SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
         int numClicks = settings.getInt("numClicks", 0);
